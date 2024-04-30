@@ -1,0 +1,75 @@
+app.background = gradient('lavender', rgb(255, 161, 203), start='bottom-right')
+app.scoop = 0 
+app.tower = []
+app.stepsPerSecond = 60
+
+#labels for cone selection
+Label('Cone Type', 200, 40, size = 20)
+pancakeConeLabel = Label('Pancake', 100, 80, size = 20)
+cupConeLabel = Label('Cup', 300, 80, size = 20)
+
+#coneshapes and what not
+pancakeCone = Polygon(320, 400, 275, 280, 365, 280, fill = gradient('blanchedAlmond', 'bisque', 'bisque', start = 'top'), visible = False)
+cupCone = Group(
+    Rect(280, 300, 80, 100, fill = gradient('navajoWhite', 'wheat', start = 'top')),
+    Rect(260, 280, 120, 30, fill = 'navajoWhite')
+)
+cupCone.visible = False
+
+#flavors
+strawberryLabel = Label('strawberry flavor', 100,  150, size = 20, fill = 'crimson', font = 'montserrat')
+chocolateLabel = Label('ch\u00F6colate flavor', 100, 180, size = 20, fill = 'chocolate', font = 'monospace')
+vanillaLabel = Label('van\u00efll\u00efa flavor', 100, 210, size = 20, fill = 'antiqueWhite', font = 'orbitron')
+
+#eat button
+eatButton = Circle(100, 290, 35, border='plum', fill = gradient('lavender', rgb(255, 161, 203), start='bottom-right'))
+eatLabel = Label('múnch', 100, 290, size = 20)
+
+#custom functions to add things to list.
+def addCone(cone):
+    if (cone == 'pancake'):
+        pancakeCone.visible = True
+        pancakeCone.toFront()
+        app.tower.append(pancakeCone)
+    elif (cone == 'cup'):
+        cupCone.visible = True
+        cupCone.toFront()
+        app.tower.append(cupCone)
+
+def addScoop(X, Y):
+    if strawberryLabel.hits(X, Y):
+        app.tower.append(Circle(320, 280 - 20 * app.scoop, 38, fill = 'crimson'))
+        app.tower[-1].toBack()
+        app.scoop += 1
+    elif chocolateLabel.hits(X, Y):
+        app.tower.append(Circle(320, 280 - 20 * app.scoop, 38, fill = 'chocolate'))
+        app.tower[-1].toBack()
+        app.scoop += 1
+    elif vanillaLabel.hits(X, Y):
+        app.tower.append(Circle(320, 280 - 20 * app.scoop, 38, fill = 'antiqueWhite'))
+        app.tower[-1].toBack()
+        app.scoop += 1
+    for scoop in app.tower:
+        if scoop != cupCone:
+            scoop.rotateAngle += 30
+        
+def consume(number):
+    app.tower.pop(number).visible = False
+
+
+def onMousePress(mouseX, mouseY):
+    if cupConeLabel.hits(mouseX, mouseY):
+        addCone('cup')
+    elif pancakeConeLabel.hits(mouseX, mouseY):
+        addCone('pancake')
+    elif strawberryLabel.hits(mouseX, mouseY):
+        addScoop(mouseX, mouseY)
+    elif chocolateLabel.hits(mouseX, mouseY):
+        addScoop(mouseX, mouseY)
+    elif vanillaLabel.hits(mouseX, mouseY):
+        addScoop(mouseX, mouseY)
+    elif eatButton.hits(mouseX, mouseY):
+        if len(app.tower) > 0:
+            consume(-1)
+            if app.scoop >= 1:
+                app.scoop -= 1
